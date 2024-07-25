@@ -14,7 +14,7 @@ const Home = () => {
                 return response.json();
             })
             .then((data) => {
-                console.log(data)
+                console.log(data);
                 if (Array.isArray(data.todos)) {
                     setTodos(data.todos);
                 } else {
@@ -34,19 +34,17 @@ const Home = () => {
 
     // Función para agregar un nuevo todo
     const addTodo = () => {
-        const newTodos = [...todos, { label: todo, done: false }];
-        fetch(apiURL, {
+        const newTodo = { label: todo, done: false };
+        fetch("https://playground.4geeks.com/todo/todos/AngelCS94", {
             method: "POST",
+            body: JSON.stringify(newTodo),
             headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(newTodos),
+                "Content-Type": "application/json" // Corregido
+            }
         })
-            .then((response) => {
-                if (!response.ok) throw new Error('Error al agregar el todo');
-                return response.json();
-            })
-            .then(() => {
+            .then((response) => response.json()) // Corregido
+            .then((data) => {
+                console.log(data);
                 getTodos();
                 setTodo("");
             })
@@ -56,17 +54,16 @@ const Home = () => {
     };
 
     // Función para eliminar un todo
-    const deleteTodo = (index) => {
-        const newTodos = todos.filter((_, i) => i !== index);
-        fetch(apiURL, {
-            method: "POST",
+    const deleteTodo = (id) => {
+        const deleteURL = `https://playground.4geeks.com/todo/todos/${id}`;
+
+        fetch(deleteURL, {
+            method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(newTodos),
         })
-            .then((response) => {response.json();
-            })
+            .then((response) => response.json())
             .then(() => {
                 getTodos();
             })
@@ -79,9 +76,7 @@ const Home = () => {
     const handleAddTodo = (e) => {
         if (e.key === "Enter") {
             e.preventDefault(); // Para evitar que se recargue la página
-            if (todo.trim() !== "") {
-                addTodo();
-            }
+            addTodo();
         }
     };
 
@@ -107,7 +102,7 @@ const Home = () => {
                 {Array.isArray(todos) && todos.map((item, index) => (
                     <li key={index} className="list-group-item d-flex justify-content-between align-items-center mt-2">
                         {item.label}
-                        <button className="btn btn-danger" onClick={() => deleteTodo(index)}>
+                        <button className="btn btn-danger" onClick={() => deleteTodo(item.id)}>
                             X
                         </button>
                     </li>

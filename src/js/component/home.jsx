@@ -42,7 +42,10 @@ const Home = () => {
                 "Content-Type": "application/json" // Corregido
             }
         })
-            .then((response) => response.json()) // Corregido
+            .then((response) => {
+                if (!response.ok) throw new Error('Error al agregar el todo');
+                return response.json();
+            })
             .then((data) => {
                 console.log(data);
                 getTodos();
@@ -63,8 +66,14 @@ const Home = () => {
                 "Content-Type": "application/json",
             },
         })
-            .then((response) => response.json())
-            .then(() => {
+            .then((response) => {
+                console.log('Response status:', response.status);
+                if (!response.ok) throw new Error('Error al eliminar el todo');
+                // Si la respuesta es vacía, retornamos un objeto vacío
+                return response.status === 204 ? {} : response.json();
+            })
+            .then((data) => {
+                console.log('Todo eliminado:', data);
                 getTodos();
             })
             .catch((error) => {
